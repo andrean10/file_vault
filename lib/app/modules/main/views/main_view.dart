@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -6,9 +5,7 @@ import 'package:file_manager/file_manager.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_vault/utils/constants_values.dart';
 import 'package:file_vault/utils/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -80,317 +77,336 @@ class MainView extends GetView<MainController> {
         builder: (context, snapshot) {
           final entities = snapshot;
 
-          return FutureBuilder(
-            future: controller.decryptEntities(entities),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (snapshot.hasData && snapshot.data != null) {
-                final bytes = snapshot.data!;
+          // return FutureBuilder(
+          //   future: controller.decryptEntities(entities),
+          //   builder: (context, snapshot) {
+          //     if (snapshot.connectionState == ConnectionState.waiting) {
+          //       return const Center(
+          //         child: CircularProgressIndicator(),
+          //       );
+          //     } else if (snapshot.hasData && snapshot.data != null) {
+          //       final bytes = snapshot.data!;
 
-                return GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                    ),
-                    itemCount: entities.length,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {},
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Image.memory(
-                                    bytes,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-
-                      // return InkWell(
-                      //   onTap: () {
-                      //     // if (FileManager.isDirectory(entity)) {
-                      //     //   controller.fileManagerC.openDirectory(entity.);
-                      //     // } else {
-                      //     //   controller.tapFile(entity.);
-                      //     // }
-                      //   },
-                      //   child: Container(
-                      //     padding: const EdgeInsets.symmetric(horizontal: 4),
-                      //     child: Column(
-                      //       children: [
-                      //         Expanded(
-                      //           child: FutureBuilder(
-                      //             future: controller.readFileEncrypt(
-                      //               initC: controller.initC,
-                      //               aesCrypt: controller.aesCrypt,
-                      //               item: item,
-                      //             ),
-                      //             builder: (context, snapshot) {
-                      //               if (snapshot.connectionState ==
-                      //                   ConnectionState.waiting) {
-                      //                 return const Center(
-                      //                   child: CircularProgressIndicator(),
-                      //                 );
-                      //               } else if (snapshot.hasData &&
-                      //                   snapshot.data != null) {
-                      //                 final bytesFile = snapshot.data;
-                      //                 final fileName =
-                      //                     FileManager.basename(item)
-                      //                         .replaceAll('.aes', '');
-                      //                 final isImageFile =
-                      //                     fileName.isImageFileName;
-                      //                 final isVideoFile =
-                      //                     fileName.isVideoFileName;
-
-                      //                 if (isImageFile) {
-                      //                   return Padding(
-                      //                     padding: const EdgeInsets.all(8.0),
-                      //                     child: Image.memory(
-                      //                       bytesFile!,
-                      //                       width: double.infinity,
-                      //                       height: double.infinity,
-                      //                       fit: BoxFit.cover,
-                      //                     ),
-                      //                   );
-                      //                 }
-
-                      //                 if (isVideoFile) {
-                      //                   return FutureBuilder(
-                      //                     future: generatedThumbnailVideo(
-                      //                       dirPath: '${controller.dir}/.temp',
-                      //                       fileName: fileName,
-                      //                       byteData: bytesFile!,
-                      //                     ),
-                      //                     builder: (context, snapshot) {
-                      //                       if (snapshot.hasData &&
-                      //                           snapshot.data != null) {
-                      //                         final data = snapshot.data;
-
-                      //                         return Padding(
-                      //                           padding:
-                      //                               const EdgeInsets.all(8.0),
-                      //                           child: Image.memory(
-                      //                             data!,
-                      //                             width: double.infinity,
-                      //                             height: double.infinity,
-                      //                             fit: BoxFit.cover,
-                      //                           ),
-                      //                         );
-                      //                       }
-
-                      //                       return builderIcon(
-                      //                         theme: theme,
-                      //                         item: item,
-                      //                       );
-                      //                     },
-                      //                   );
-                      //                 }
-
-                      //                 return builderIcon(
-                      //                   theme: theme,
-                      //                   item: item,
-                      //                 );
-                      //               } else {
-                      //                 return builderIcon(
-                      //                   theme: theme,
-                      //                   item: item,
-                      //                 );
-                      //               }
-                      //             },
-                      //           ),
-                      //         ),
-                      //         const Gap(2),
-                      //         AutoSizeText(
-                      //           FileManager.basename(item),
-                      //           style: theme.textTheme.labelLarge,
-                      //           minFontSize:
-                      //               theme.textTheme.labelSmall?.fontSize ?? 12,
-                      //           textAlign: TextAlign.center,
-                      //           maxLines: 2,
-                      //           overflow: TextOverflow.fade,
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // );
-                    }
-                    // },
-                    );
-              }
-
-              return Container();
-            },
-          );
-
-          // if (entities.isNotEmpty) {
-          //   return GridView.builder(
-          //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          //       crossAxisCount: 3,
-          //       childAspectRatio: 0.75,
-          //     ),
-          //     itemBuilder: (context, index) {
-          //       final item = entities[index];
-
-          //       return InkWell(
-          //         onTap: () {
-          //           if (FileManager.isDirectory(item)) {
-          //             controller.fileManagerC.openDirectory(item);
-          //           } else {
-          //             controller.tapFile(item);
-          //           }
-          //         },
-          //         // onLongPress: () async => await item.delete(),
-          //         child: Container(
-          //           padding: const EdgeInsets.symmetric(horizontal: 4),
-          //           child: Column(
-          //             children: [
-          //               Expanded(
-          //                 child: FutureBuilder(
-          //                   future: controller.readFileEncrypt(
-          //                     initC: controller.initC,
-          //                     aesCrypt: controller.aesCrypt,
-          //                     item: item,
-          //                   ),
-          //                   builder: (context, snapshot) {
-          //                     if (snapshot.connectionState ==
-          //                         ConnectionState.waiting) {
-          //                       return const Center(
-          //                         child: CircularProgressIndicator(),
-          //                       );
-          //                     } else if (snapshot.hasData &&
-          //                         snapshot.data != null) {
-          //                       final bytesFile = snapshot.data;
-          //                       final fileName = FileManager.basename(item)
-          //                           .replaceAll('.aes', '');
-          //                       final isImageFile = fileName.isImageFileName;
-          //                       final isVideoFile = fileName.isVideoFileName;
-
-          //                       if (isImageFile) {
-          //                         return Padding(
-          //                           padding: const EdgeInsets.all(8.0),
-          //                           child: Image.memory(
-          //                             bytesFile!,
-          //                             width: double.infinity,
-          //                             height: double.infinity,
-          //                             fit: BoxFit.cover,
-          //                           ),
-          //                         );
-          //                       }
-
-          //                       if (isVideoFile) {
-          //                         return FutureBuilder(
-          //                           future: generatedThumbnailVideo(
-          //                             dirPath: '${controller.dir}/.temp',
-          //                             fileName: fileName,
-          //                             byteData: bytesFile!,
-          //                           ),
-          //                           builder: (context, snapshot) {
-          //                             if (snapshot.hasData &&
-          //                                 snapshot.data != null) {
-          //                               final data = snapshot.data;
-
-          //                               return Padding(
-          //                                 padding: const EdgeInsets.all(8.0),
-          //                                 child: Image.memory(
-          //                                   data!,
-          //                                   width: double.infinity,
-          //                                   height: double.infinity,
-          //                                   fit: BoxFit.cover,
-          //                                 ),
-          //                               );
-          //                             }
-
-          //                             return builderIcon(
-          //                               theme: theme,
-          //                               item: item,
-          //                             );
-          //                           },
-          //                         );
-          //                       }
-
-          //                       return builderIcon(
-          //                         theme: theme,
-          //                         item: item,
-          //                       );
-          //                     } else {
-          //                       return builderIcon(
-          //                         theme: theme,
-          //                         item: item,
-          //                       );
-          //                     }
-          //                   },
+          //       return GridView.builder(
+          //           gridDelegate:
+          //               const SliverGridDelegateWithFixedCrossAxisCount(
+          //             crossAxisCount: 3,
+          //           ),
+          //           itemCount: entities.length,
+          //           itemBuilder: (context, index) {
+          //             return InkWell(
+          //               onTap: () {},
+          //               child: Container(
+          //                 padding: const EdgeInsets.symmetric(horizontal: 4),
+          //                 child: Column(
+          //                   children: [
+          //                     Expanded(
+          //                       child: Padding(
+          //                         padding: const EdgeInsets.all(8.0),
+          //                         child: Image.memory(
+          //                           bytes,
+          //                           width: double.infinity,
+          //                           height: double.infinity,
+          //                           fit: BoxFit.cover,
+          //                         ),
+          //                       ),
+          //                     ),
+          //                   ],
           //                 ),
           //               ),
-          //               const Gap(2),
-          //               AutoSizeText(
-          //                 FileManager.basename(item),
-          //                 style: theme.textTheme.labelLarge,
-          //                 minFontSize:
-          //                     theme.textTheme.labelSmall?.fontSize ?? 12,
-          //                 textAlign: TextAlign.center,
-          //                 maxLines: 2,
-          //                 overflow: TextOverflow.fade,
-          //               ),
-          //             ],
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //     itemCount: entities.length,
-          //   );
-          // }
+          //             );
 
-          // return builderEmptyFolder(theme);
-        },
-      ),
-      floatingActionButton: Obx(
-        () {
-          final file = File(controller.filePath.value);
-          final isTapFile = controller.isTapFile.value;
-          final isLoadingEncrypted = controller.isLoading.value;
-          final extension = FileManager.getFileExtension(file);
+          //             // return InkWell(
+          //             //   onTap: () {
+          //             //     // if (FileManager.isDirectory(entity)) {
+          //             //     //   controller.fileManagerC.openDirectory(entity.);
+          //             //     // } else {
+          //             //     //   controller.tapFile(entity.);
+          //             //     // }
+          //             //   },
+          //             //   child: Container(
+          //             //     padding: const EdgeInsets.symmetric(horizontal: 4),
+          //             //     child: Column(
+          //             //       children: [
+          //             //         Expanded(
+          //             //           child: FutureBuilder(
+          //             //             future: controller.readFileEncrypt(
+          //             //               initC: controller.initC,
+          //             //               aesCrypt: controller.aesCrypt,
+          //             //               item: item,
+          //             //             ),
+          //             //             builder: (context, snapshot) {
+          //             //               if (snapshot.connectionState ==
+          //             //                   ConnectionState.waiting) {
+          //             //                 return const Center(
+          //             //                   child: CircularProgressIndicator(),
+          //             //                 );
+          //             //               } else if (snapshot.hasData &&
+          //             //                   snapshot.data != null) {
+          //             //                 final bytesFile = snapshot.data;
+          //             //                 final fileName =
+          //             //                     FileManager.basename(item)
+          //             //                         .replaceAll('.aes', '');
+          //             //                 final isImageFile =
+          //             //                     fileName.isImageFileName;
+          //             //                 final isVideoFile =
+          //             //                     fileName.isVideoFileName;
 
-          if (isTapFile) {
-            return FloatingActionButton.extended(
-              onPressed: () {
-                if (extension != 'aes') {
-                  controller.encryptFile();
-                } else {
-                  controller.decryptFile(file);
-                }
-              },
-              label: Text(
-                isLoadingEncrypted
-                    ? 'Loading'
-                    : extension != 'aes'
-                        ? 'Encrypt File'
-                        : 'Decrypt File',
+          //             //                 if (isImageFile) {
+          //             //                   return Padding(
+          //             //                     padding: const EdgeInsets.all(8.0),
+          //             //                     child: Image.memory(
+          //             //                       bytesFile!,
+          //             //                       width: double.infinity,
+          //             //                       height: double.infinity,
+          //             //                       fit: BoxFit.cover,
+          //             //                     ),
+          //             //                   );
+          //             //                 }
+
+          //             //                 if (isVideoFile) {
+          //             //                   return FutureBuilder(
+          //             //                     future: generatedThumbnailVideo(
+          //             //                       dirPath: '${controller.dir}/.temp',
+          //             //                       fileName: fileName,
+          //             //                       byteData: bytesFile!,
+          //             //                     ),
+          //             //                     builder: (context, snapshot) {
+          //             //                       if (snapshot.hasData &&
+          //             //                           snapshot.data != null) {
+          //             //                         final data = snapshot.data;
+
+          //             //                         return Padding(
+          //             //                           padding:
+          //             //                               const EdgeInsets.all(8.0),
+          //             //                           child: Image.memory(
+          //             //                             data!,
+          //             //                             width: double.infinity,
+          //             //                             height: double.infinity,
+          //             //                             fit: BoxFit.cover,
+          //             //                           ),
+          //             //                         );
+          //             //                       }
+
+          //             //                       return builderIcon(
+          //             //                         theme: theme,
+          //             //                         item: item,
+          //             //                       );
+          //             //                     },
+          //             //                   );
+          //             //                 }
+
+          //             //                 return builderIcon(
+          //             //                   theme: theme,
+          //             //                   item: item,
+          //             //                 );
+          //             //               } else {
+          //             //                 return builderIcon(
+          //             //                   theme: theme,
+          //             //                   item: item,
+          //             //                 );
+          //             //               }
+          //             //             },
+          //             //           ),
+          //             //         ),
+          //             //         const Gap(2),
+          //             //         AutoSizeText(
+          //             //           FileManager.basename(item),
+          //             //           style: theme.textTheme.labelLarge,
+          //             //           minFontSize:
+          //             //               theme.textTheme.labelSmall?.fontSize ?? 12,
+          //             //           textAlign: TextAlign.center,
+          //             //           maxLines: 2,
+          //             //           overflow: TextOverflow.fade,
+          //             //         ),
+          //             //       ],
+          //             //     ),
+          //             //   ),
+          //             // );
+          //           }
+          //           // },
+          //           );
+          //     }
+
+          //     return Container();
+          //   },
+          // );
+
+          if (entities.isNotEmpty) {
+            return GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 0.75,
               ),
-              icon: isLoadingEncrypted
-                  ? const CircularProgressIndicator()
-                  : Icon(
-                      extension != 'aes'
-                          ? Icons.lock_rounded
-                          : Icons.lock_open_rounded,
+              itemBuilder: (context, index) {
+                final item = entities[index];
+
+                return InkWell(
+                  onTap: () {
+                    if (FileManager.isDirectory(item)) {
+                      controller.fileManagerC.openDirectory(item);
+                    } else {
+                      controller.tapFile(item);
+                    }
+                  },
+                  // onLongPress: () async => await item.delete(),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: FutureBuilder(
+                            key: Key(item.path),
+                            future: controller.readFileEncrypt(item),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else if (snapshot.hasData &&
+                                  snapshot.data != null) {
+                                final bytesFile = snapshot.data;
+                                final fileName = FileManager.basename(item)
+                                    .replaceAll('.aes', '');
+                                final isImageFile = fileName.isImageFileName;
+                                final isVideoFile = fileName.isVideoFileName;
+                                final isPdfFile = fileName.isPDFFileName;
+                                final isExcelFile = fileName.isExcelFileName;
+
+                                if (isImageFile) {
+                                  return Thumbnail(
+                                    mimeType: 'image/*',
+                                    widgetSize: 150,
+                                    dataResolver: () => Future.value(bytesFile),
+                                  );
+                                }
+
+                                if (isVideoFile) {
+                                  return FutureBuilder(
+                                    future: generatedThumbnailVideo(item),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      } else if (snapshot.hasData &&
+                                          snapshot.data != null) {
+                                        final data = snapshot.data;
+
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.memory(
+                                            data!,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        );
+                                      }
+
+                                      return builderIcon(
+                                        theme: theme,
+                                        item: item,
+                                      );
+                                    },
+                                  );
+                                }
+
+                                if (isPdfFile) {
+                                  return Thumbnail(
+                                    mimeType: 'application/pdf',
+                                    widgetSize: 150,
+                                    dataResolver: () => Future.value(bytesFile),
+                                  );
+                                }
+
+                                if (isExcelFile) {
+                                  debugPrint(
+                                      'debug: isExcelFile = $isExcelFile');
+
+                                  return Thumbnail(
+                                    mimeType:
+                                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                    widgetSize: 120,
+                                    dataResolver: () => Future.value(bytesFile),
+                                    decoration: WidgetDecoration(
+                                      wrapperBgColor: Colors.blueAccent,
+                                    ),
+                                  );
+                                }
+
+                                return builderIcon(
+                                  theme: theme,
+                                  item: item,
+                                );
+                              } else {
+                                return builderIcon(
+                                  theme: theme,
+                                  item: item,
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                        const Gap(2),
+                        AutoSizeText(
+                          FileManager.basename(item),
+                          style: theme.textTheme.labelLarge,
+                          minFontSize:
+                              theme.textTheme.labelSmall?.fontSize ?? 12,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.fade,
+                        ),
+                      ],
                     ),
+                  ),
+                );
+              },
+              itemCount: entities.length,
             );
           }
-          return Container();
+
+          return builderEmptyFolder(theme);
         },
       ),
+      // floatingActionButton: Obx(
+      //   () {
+      //     final file = File(controller.filePath.value);
+      //     final isTapFile = controller.isTapFile.value;
+      //     final isLoadingEncrypted = controller.isLoading.value;
+      //     final extension = FileManager.getFileExtension(file);
+
+      //     if (isTapFile) {
+      //       return FloatingActionButton.extended(
+      //         onPressed: () {
+      //           if (extension != 'aes') {
+      //             controller.encryptFile();
+      //           } else {
+      //             controller.decryptFile(file);
+      //           }
+      //         },
+      //         label: Text(
+      //           isLoadingEncrypted
+      //               ? 'Loading'
+      //               : extension != 'aes'
+      //                   ? 'Encrypt File'
+      //                   : 'Decrypt File',
+      //         ),
+      //         icon: isLoadingEncrypted
+      //             ? const CircularProgressIndicator()
+      //             : Icon(
+      //                 extension != 'aes'
+      //                     ? Icons.lock_rounded
+      //                     : Icons.lock_open_rounded,
+      //               ),
+      //       );
+      //     }
+      //     return Container();
+      //   },
+      // ),
     );
   }
 

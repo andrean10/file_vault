@@ -2,8 +2,8 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:get_thumbnail_video/video_thumbnail.dart';
 import 'package:logger/logger.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 String generateRandomString(int length) {
   const characters =
@@ -15,28 +15,16 @@ String generateRandomString(int length) {
   ));
 }
 
-Future<Uint8List?> generatedThumbnailVideo({
-  required String dirPath,
-  required String fileName,
-  required Uint8List byteData,
-}) async {
+Future<Uint8List?> generatedThumbnailVideo(FileSystemEntity item) async {
+  Logger().d('debug: generatedThumbnailVideo path item = ${item.path}');
+
   try {
-    final tempVideo = File("$dirPath/$fileName")
-      ..create(recursive: true)
-      ..writeAsBytes(
-        byteData.buffer.asUint8List(
-          byteData.offsetInBytes,
-          byteData.lengthInBytes,
-        ),
-      );
-
-    Logger().d('debug: tempVideo = $tempVideo');
-
-    return await VideoThumbnail.thumbnailData(
-      video: tempVideo.path,
-      imageFormat: ImageFormat.WEBP,
+    final result = await VideoThumbnail.thumbnailData(
+      video: item.path,
+      maxWidth: 128,
       quality: 50,
     );
+    return result;
   } catch (e) {
     Logger().e('Error: generatedThumbnailVideo = $e');
   }

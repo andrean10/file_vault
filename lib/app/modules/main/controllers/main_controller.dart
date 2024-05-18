@@ -149,11 +149,7 @@ class MainController extends GetxController {
     }
   }
 
-  Future<Uint8List> processEncryt(Map<String, dynamic> args) {
-    final initC = args['initC'] as InitController;
-    final item = args['item'] as FileSystemEntity;
-    final aesCrypt = args['aesCrypt'] as AesCrypt;
-
+  Future<Uint8List>? readFileEncrypt(FileSystemEntity item) async {
     final map = initC.memoizerMap;
 
     final nameFile = FileManager.basename(item);
@@ -167,19 +163,6 @@ class MainController extends GetxController {
     return map[nameFile]!.runOnce(() async {
       return await aesCrypt.decryptDataFromFile(item.path);
     });
-  }
-
-  Future<Uint8List>? readFileEncrypt({
-    required InitController initC,
-    required AesCrypt aesCrypt,
-    required FileSystemEntity item,
-  }) async {
-    final map = <String, dynamic>{
-      'initC': initC,
-      'aesCrypt': aesCrypt,
-      'item': item
-    };
-    return compute(processEncryt, map, debugLabel: 'compute dijalankan');
   }
 
   Future<Uint8List?> decryptFile(FileSystemEntity item) async {
@@ -254,7 +237,7 @@ class MainController extends GetxController {
 
   void decryptEntities(List<FileSystemEntity> entities) async {
     final map = initC.memoizerMap;
-  
+
     for (var entity in entities) {
       final nameFile = FileManager.basename(entity);
 
@@ -266,7 +249,8 @@ class MainController extends GetxController {
       final test = await map[nameFile]!.runOnce(() async {
         return await aesCrypt.decryptDataFromFile(entity.path);
       });
-    }}
+    }
+  }
 
   List<Uint8List> _decryptEntitiesInIsolate(List<FileSystemEntity> entities) {
     final map = <String, AsyncMemoizer<Uint8List>>{};
