@@ -10,16 +10,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../../../utils/utils.dart';
 import '../../../routes/app_pages.dart';
 
 class MainController extends GetxController {
   late final InitController initC;
   late final FileManagerController fileManagerC;
   late final AesCrypt aesCrypt;
+  late final ImagePicker imagePicker;
 
   final isEncryptedFile = false.obs;
 
@@ -48,6 +49,8 @@ class MainController extends GetxController {
 
     aesCrypt = AesCrypt('file_vault');
     aesCrypt.setOverwriteMode(AesCryptOwMode.warn);
+
+    imagePicker = ImagePicker();
   }
 
   void setInitialDirectory() {
@@ -91,11 +94,21 @@ class MainController extends GetxController {
 
         for (var file in filePicker) {
           if (file.path != null) {
-            final path = await aesCrypt.encryptDataToFile(
+            await aesCrypt.encryptDataToFile(
               file.bytes!,
               '${dir.path}/${file.name}.aes',
             );
-            logger.d('debug: path = $path');
+
+            // create key path
+            final textPath = file.identifier?.replaceAll('file://', '');
+
+            logger.d('debug: textPath = $textPath');
+
+            if (textPath != null) {
+              final fileText = File('${dir.path}/key_${file.name}.txt');
+              fileText.writeAsStringSync(textPath);
+              deleteOriginalFile(path: textPath);
+            }
           }
         }
 
@@ -106,48 +119,64 @@ class MainController extends GetxController {
     }
   }
 
+  Future<void> deleteOriginalFile({String? path, String? uri}) async {
+    if (path != null) {
+      final file = File(path);
+
+      if (file.existsSync()) {
+        file.deleteSync();
+        logger.d('debug: file deleted successfully');
+      }
+    }
+
+    if (uri != null) {
+      final file = File.fromUri(Uri.parse(uri));
+      logger.d('debug: file path = ${file.path}');
+    }
+  }
+
   void tapFile(FileSystemEntity item) {
     isTapFile.value = !isTapFile.value;
     filePath.value = item.path;
     logger.d('debug: tapFile filePath = $filePath');
   }
 
-  Future<void> encryptFile() async {
-    isLoading.value = true;
+  // Future<void> encryptFile() async {
+  //   isLoading.value = true;
 
-    final randomName = generateRandomString(16);
-    final newFolderToFile = '${dir.path}/$randomName';
+  //   final randomName = generateRandomString(16);
+  //   final newFolderToFile = '${dir.path}/$randomName';
 
-    logger.d('debug: newFolderToFile = $newFolderToFile');
+  //   logger.d('debug: newFolderToFile = $newFolderToFile');
 
-    // buat dulu folder untuk file enkripsi
-    final dirInvisibleFile = Directory(newFolderToFile);
-    if (!dirInvisibleFile.existsSync()) {
-      dirInvisibleFile.createSync();
-      logger.i('info: create dirInvisibleFile');
-    }
+  //   // buat dulu folder untuk file enkripsi
+  //   final dirInvisibleFile = Directory(newFolderToFile);
+  //   if (!dirInvisibleFile.existsSync()) {
+  //     dirInvisibleFile.createSync();
+  //     logger.i('info: create dirInvisibleFile');
+  //   }
 
-    logger.d('debug: path encrypted file = $newFolderToFile/$randomName.aes');
+  //   logger.d('debug: path encrypted file = $newFolderToFile/$randomName.aes');
 
-    try {
-      // final nameFile =
-      await aesCrypt.encryptFile(
-        filePath.value,
-        '$newFolderToFile/$randomName.aes',
-      );
+  //   try {
+  //     // final nameFile =
+  //     await aesCrypt.encryptFile(
+  //       filePath.value,
+  //       '$newFolderToFile/$randomName.aes',
+  //     );
 
-      final text = filePath.value;
-      // final nameKey =
-      await aesCrypt.encryptTextToFile(text, '$newFolderToFile/key.txt.aes');
+  //     final text = filePath.value;
+  //     // final nameKey =
+  //     await aesCrypt.encryptTextToFile(text, '$newFolderToFile/key.txt.aes');
 
-      // hapus file yang dienkripsi sebelumnya
-      final oldFile = File(filePath.value);
-      await oldFile.delete(recursive: true);
-      isLoading.value = false;
-    } catch (e) {
-      logger.e('error: $e');
-    }
-  }
+  //     // hapus file yang dienkripsi sebelumnya
+  //     final oldFile = File(filePath.value);
+  //     await oldFile.delete(recursive: true);
+  //     isLoading.value = false;
+  //   } catch (e) {
+  //     logger.e('error: $e');
+  //   }
+  // }
 
   Future<Uint8List>? readFileEncrypt(FileSystemEntity item) async {
     final map = initC.memoizerMap;
@@ -165,37 +194,30 @@ class MainController extends GetxController {
     });
   }
 
-  Future<Uint8List?> decryptFile(FileSystemEntity item) async {
+  Future<void> decryptFile({
+    required File fileAes,
+    required File fileKey,
+  }) async {
     isLoading.value = true;
 
     try {
-      final decryptedFile = await aesCrypt.decryptDataFromFile(item.path);
+      // read key path
+      final pathDir = await fileKey.readAsString();
+      logger.d('debug: pathDir = $pathDir');
+
+      final decryptedFile = await aesCrypt.decryptFile(fileAes.path, pathDir);
       logger.d('debug: decryptedFile = $decryptedFile');
 
-      return decryptedFile;
-
-      // // decrypt dulu key nya
-      // final pathKey =
-      //     aesCrypt.decryptTextFromFileSync('${item.path}/key.txt.aes');
-      // logger.d('debug: pathKey = $pathKey');
-
-      // final test = item.path;
-      // logger.d('debug: test = $test');
-
-      // logger.d(
-      //     'debug: path decrypt file = ${item.path}/${FileManager.basename(item.path)}.aes');
-
-      // decrypt file-nya
-      // await crypt.decryptFile(
-      //     '${item.path}/${FileManager.basename(item.path)}.aes', pathKey);
-      // logger.d('debug: Decrypt done');
+      // delete file aes encrypted
+      if (await fileAes.exists()) {
+        await fileAes.delete();
+        Get.offAllNamed(Routes.MAIN);
+      }
     } catch (e) {
       logger.e('Error: decryptFile = $e');
     } finally {
       isLoading.value = false;
     }
-
-    return null;
   }
 
   void _showSnackBar() {
@@ -233,72 +255,5 @@ class MainController extends GetxController {
   void onClose() {
     fileManagerC.dispose();
     super.onClose();
-  }
-
-  void decryptEntities(List<FileSystemEntity> entities) async {
-    final map = initC.memoizerMap;
-
-    for (var entity in entities) {
-      final nameFile = FileManager.basename(entity);
-
-      if (!map.containsKey(nameFile)) {
-        map[nameFile] = AsyncMemoizer<Uint8List>();
-      }
-
-      // Jalankan dekripsi dan simpan hasilnya ke memoizer
-      final test = await map[nameFile]!.runOnce(() async {
-        return await aesCrypt.decryptDataFromFile(entity.path);
-      });
-    }
-  }
-
-  List<Uint8List> _decryptEntitiesInIsolate(List<FileSystemEntity> entities) {
-    final map = <String, AsyncMemoizer<Uint8List>>{};
-
-    // List untuk menyimpan hasil dekripsi
-    final decryptedResults = <Uint8List>[];
-
-    // Lakukan iterasi pada setiap entitas
-    for (var entity in entities) {
-      final nameFile = FileManager.basename(entity);
-
-      if (!map.containsKey(nameFile)) {
-        map[nameFile] = AsyncMemoizer<Uint8List>();
-      }
-
-      // Jalankan dekripsi dan simpan hasilnya ke memoizer
-      map[nameFile]!.runOnce(() async {
-        final decryptedData = await aesCrypt.decryptDataFromFile(entity.path);
-        decryptedResults
-            .add(decryptedData); // Tambahkan hasil dekripsi ke dalam daftar
-        return decryptedData; // Kembalikan hasil dekripsi
-      });
-    }
-
-    return decryptedResults;
-  }
-
-  Stream<Uint8List> decryptEntitiesStream(
-      List<FileSystemEntity> entities) async* {
-    final map = initC.memoizerMap;
-
-    for (var entity in entities) {
-      final nameFile = FileManager.basename(entity);
-
-      if (!map.containsKey(nameFile)) {
-        map[nameFile] = AsyncMemoizer<Uint8List>();
-      }
-
-      final completer = Completer<Uint8List>();
-
-      map[nameFile]!.runOnce(() async {
-        final result = await aesCrypt.decryptDataFromFile(entity.path);
-        completer.complete(result);
-        return result;
-      });
-
-      // Emit hasil dekripsi
-      yield await completer.future;
-    }
   }
 }

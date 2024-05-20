@@ -10,37 +10,18 @@ class SplashView extends GetView<SplashController> {
 
   @override
   Widget build(BuildContext context) {
-    MediaQuery.sizeOf(context);
+    final size = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      body: Image.asset(
-        ConstantsAssetImage.logo,
+      body: Container(
+        padding: const EdgeInsets.all(16.0),
         alignment: Alignment.center,
-        fit: BoxFit.fitHeight,
-        width: double.infinity,
-        height: double.infinity,
-      ).animate().fadeIn(duration: 2000.ms),
-      // body: Center(
-      //     child: Column(
-      //   mainAxisSize: MainAxisSize.min,
-      //   children: [
-      //     Hero(
-      //       tag: 'splash_logo',
-      //       child: Image.asset(
-      //         ConstantsAssetImage.logo,
-      //         width: size.width * 0.5,
-      //       ),
-      //     ),
-      //     const Gap(42),
-      //     AutoSizeText(
-      //       ConstantsValues.appName,
-      //       style: textTheme.titleLarge,
-      //       maxFontSize: 32,
-      //     ),
-      //   ],
-      // )
-      //     // .animate().fadeIn(duration: 2000.ms),
-      //     ),
+        child: Image.asset(
+          ConstantsAssetImage.logo,
+          fit: BoxFit.cover,
+          width: size.width / 2,
+        ).animate().fadeIn(duration: 2000.ms),
+      ),
     );
   }
 }

@@ -62,12 +62,12 @@ class MainView extends GetView<MainController> {
               controller.addFile(type);
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.settings_rounded),
-            onPressed: () {
-              // email optional
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.settings_rounded),
+          //   onPressed: () {
+          //     // email optional
+          //   },
+          // ),
         ],
       ),
       body: FileManager(
@@ -75,162 +75,8 @@ class MainView extends GetView<MainController> {
         emptyFolder: builderEmptyFolder(theme),
         errorBuilder: (context, error) => builderErrorFolder(theme, error),
         builder: (context, snapshot) {
-          final entities = snapshot;
-
-          // return FutureBuilder(
-          //   future: controller.decryptEntities(entities),
-          //   builder: (context, snapshot) {
-          //     if (snapshot.connectionState == ConnectionState.waiting) {
-          //       return const Center(
-          //         child: CircularProgressIndicator(),
-          //       );
-          //     } else if (snapshot.hasData && snapshot.data != null) {
-          //       final bytes = snapshot.data!;
-
-          //       return GridView.builder(
-          //           gridDelegate:
-          //               const SliverGridDelegateWithFixedCrossAxisCount(
-          //             crossAxisCount: 3,
-          //           ),
-          //           itemCount: entities.length,
-          //           itemBuilder: (context, index) {
-          //             return InkWell(
-          //               onTap: () {},
-          //               child: Container(
-          //                 padding: const EdgeInsets.symmetric(horizontal: 4),
-          //                 child: Column(
-          //                   children: [
-          //                     Expanded(
-          //                       child: Padding(
-          //                         padding: const EdgeInsets.all(8.0),
-          //                         child: Image.memory(
-          //                           bytes,
-          //                           width: double.infinity,
-          //                           height: double.infinity,
-          //                           fit: BoxFit.cover,
-          //                         ),
-          //                       ),
-          //                     ),
-          //                   ],
-          //                 ),
-          //               ),
-          //             );
-
-          //             // return InkWell(
-          //             //   onTap: () {
-          //             //     // if (FileManager.isDirectory(entity)) {
-          //             //     //   controller.fileManagerC.openDirectory(entity.);
-          //             //     // } else {
-          //             //     //   controller.tapFile(entity.);
-          //             //     // }
-          //             //   },
-          //             //   child: Container(
-          //             //     padding: const EdgeInsets.symmetric(horizontal: 4),
-          //             //     child: Column(
-          //             //       children: [
-          //             //         Expanded(
-          //             //           child: FutureBuilder(
-          //             //             future: controller.readFileEncrypt(
-          //             //               initC: controller.initC,
-          //             //               aesCrypt: controller.aesCrypt,
-          //             //               item: item,
-          //             //             ),
-          //             //             builder: (context, snapshot) {
-          //             //               if (snapshot.connectionState ==
-          //             //                   ConnectionState.waiting) {
-          //             //                 return const Center(
-          //             //                   child: CircularProgressIndicator(),
-          //             //                 );
-          //             //               } else if (snapshot.hasData &&
-          //             //                   snapshot.data != null) {
-          //             //                 final bytesFile = snapshot.data;
-          //             //                 final fileName =
-          //             //                     FileManager.basename(item)
-          //             //                         .replaceAll('.aes', '');
-          //             //                 final isImageFile =
-          //             //                     fileName.isImageFileName;
-          //             //                 final isVideoFile =
-          //             //                     fileName.isVideoFileName;
-
-          //             //                 if (isImageFile) {
-          //             //                   return Padding(
-          //             //                     padding: const EdgeInsets.all(8.0),
-          //             //                     child: Image.memory(
-          //             //                       bytesFile!,
-          //             //                       width: double.infinity,
-          //             //                       height: double.infinity,
-          //             //                       fit: BoxFit.cover,
-          //             //                     ),
-          //             //                   );
-          //             //                 }
-
-          //             //                 if (isVideoFile) {
-          //             //                   return FutureBuilder(
-          //             //                     future: generatedThumbnailVideo(
-          //             //                       dirPath: '${controller.dir}/.temp',
-          //             //                       fileName: fileName,
-          //             //                       byteData: bytesFile!,
-          //             //                     ),
-          //             //                     builder: (context, snapshot) {
-          //             //                       if (snapshot.hasData &&
-          //             //                           snapshot.data != null) {
-          //             //                         final data = snapshot.data;
-
-          //             //                         return Padding(
-          //             //                           padding:
-          //             //                               const EdgeInsets.all(8.0),
-          //             //                           child: Image.memory(
-          //             //                             data!,
-          //             //                             width: double.infinity,
-          //             //                             height: double.infinity,
-          //             //                             fit: BoxFit.cover,
-          //             //                           ),
-          //             //                         );
-          //             //                       }
-
-          //             //                       return builderIcon(
-          //             //                         theme: theme,
-          //             //                         item: item,
-          //             //                       );
-          //             //                     },
-          //             //                   );
-          //             //                 }
-
-          //             //                 return builderIcon(
-          //             //                   theme: theme,
-          //             //                   item: item,
-          //             //                 );
-          //             //               } else {
-          //             //                 return builderIcon(
-          //             //                   theme: theme,
-          //             //                   item: item,
-          //             //                 );
-          //             //               }
-          //             //             },
-          //             //           ),
-          //             //         ),
-          //             //         const Gap(2),
-          //             //         AutoSizeText(
-          //             //           FileManager.basename(item),
-          //             //           style: theme.textTheme.labelLarge,
-          //             //           minFontSize:
-          //             //               theme.textTheme.labelSmall?.fontSize ?? 12,
-          //             //           textAlign: TextAlign.center,
-          //             //           maxLines: 2,
-          //             //           overflow: TextOverflow.fade,
-          //             //         ),
-          //             //       ],
-          //             //     ),
-          //             //   ),
-          //             // );
-          //           }
-          //           // },
-          //           );
-          //     }
-
-          //     return Container();
-          //   },
-          // );
+          final entities =
+              snapshot.where((element) => !element.path.isTxtFileName).toList();
 
           if (entities.isNotEmpty) {
             return GridView.builder(
@@ -372,41 +218,47 @@ class MainView extends GetView<MainController> {
           return builderEmptyFolder(theme);
         },
       ),
-      // floatingActionButton: Obx(
-      //   () {
-      //     final file = File(controller.filePath.value);
-      //     final isTapFile = controller.isTapFile.value;
-      //     final isLoadingEncrypted = controller.isLoading.value;
-      //     final extension = FileManager.getFileExtension(file);
+      floatingActionButton: Obx(
+        () {
+          final file = File(controller.filePath.value);
+          final isTapFile = controller.isTapFile.value;
+          final isLoadingEncrypted = controller.isLoading.value;
+          final extension = FileManager.getFileExtension(file);
+          final pathFileKey =
+              '${controller.dir.path}/key_${FileManager.basename(file).replaceAll('.aes', '')}.txt';
+          final fileKey = File(pathFileKey);
 
-      //     if (isTapFile) {
-      //       return FloatingActionButton.extended(
-      //         onPressed: () {
-      //           if (extension != 'aes') {
-      //             controller.encryptFile();
-      //           } else {
-      //             controller.decryptFile(file);
-      //           }
-      //         },
-      //         label: Text(
-      //           isLoadingEncrypted
-      //               ? 'Loading'
-      //               : extension != 'aes'
-      //                   ? 'Encrypt File'
-      //                   : 'Decrypt File',
-      //         ),
-      //         icon: isLoadingEncrypted
-      //             ? const CircularProgressIndicator()
-      //             : Icon(
-      //                 extension != 'aes'
-      //                     ? Icons.lock_rounded
-      //                     : Icons.lock_open_rounded,
-      //               ),
-      //       );
-      //     }
-      //     return Container();
-      //   },
-      // ),
+          if (isTapFile) {
+            return FloatingActionButton.extended(
+              onPressed: () {
+                if (extension != 'aes') {
+                  // controller.encryptFile();
+                } else {
+                  controller.decryptFile(
+                    fileAes: file,
+                    fileKey: fileKey,
+                  );
+                }
+              },
+              label: Text(
+                isLoadingEncrypted
+                    ? 'Loading'
+                    : extension != 'aes'
+                        ? 'Encrypt File'
+                        : 'Decrypt File',
+              ),
+              icon: isLoadingEncrypted
+                  ? const CircularProgressIndicator()
+                  : Icon(
+                      extension != 'aes'
+                          ? Icons.lock_rounded
+                          : Icons.lock_open_rounded,
+                    ),
+            );
+          }
+          return Container();
+        },
+      ),
     );
   }
 
